@@ -7,6 +7,7 @@ them. Validated against sklearn's DecisionTreeClassifier on the same feature mat
 Pieces to build:
     - gini(y):     impurity of a label array (0 = pure, 0.5 = even binary mix)
     - best split:  scan features/thresholds, pick the largest impurity drop
+        if max_features is selected choose a random subsample of count: max_features
     - fit / grow:  recurse until a stopping rule (pure node, min samples, max depth)
     - predict:     route each row down to a leaf and return its class
 
@@ -27,20 +28,30 @@ import numpy as np
 @dataclass
 class Node:
     """Class of node, includes the feature split on, node for left or right, 
-    and if it is a lead, the output prediction
+    and if it is a leaf, the output prediction
     
-    is_lead function returns true if the node is a leaf"""
+    is_leaf function returns true if the node is a leaf"""
     feature: int | None = None    # split bit for an internal node; None on a leaf
     left: Node | None = None    # child Node for bit 0
     right: Node | None = None    # child Node for bit 1
-    prediction: int = None    # class to output on a leaf; None internally
+    prediction: int | None = None    # class to output on a leaf; None internally
 
     def is_leaf(self) -> bool:
         return self.prediction is not None
 
 class DecisionTree:
-    def __init__(self):
+    """CART-style binary classification tree.
+
+    max_features: if set, each split considers a random subset of this many
+                  features (the randomness a forest relies on); None scans all
+                  features for a plain, deterministic tree.
+    random_state: seed for the per-split feature sampling, for reproducible runs.
+    """
+        
+    def __init__(self, max_features: int = None, random_state: int = None):
         self.root: Node | None = None
+        self.max_features = max_features
+        self.rng = np.random.default_rng(random_state)
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> "DecisionTree":
         self.root = self._grow(X, y)
@@ -48,14 +59,14 @@ class DecisionTree:
 
     def _grow(self, X: np.ndarray, y: np.ndarray) -> Node:
         """3 cases, pure split, no best split, and a case where there is a good split (recursive),
-        Utlizied in fit to create a single algorithmically generated gini minimizing tree
+        Utilized in fit to create a single algorithmically generated gini minimizing tree
         """
         #Pure split case (100% one group)
         if len(np.unique(y)) == 1:
             return Node(prediction=np.bincount(y).argmax())
 
         #best split call, returns best feature to split by and the minimization gain
-        feature, gain = best_split(X, y)
+        feature, gain = best_split(X, y, self.max_features, self.rng)
 
         #No split is the best case
         if feature is None:
@@ -94,15 +105,28 @@ def gini(y: np.ndarray) -> float:
     sqsum = (props ** 2).sum()   # the sum(p_i^2) term
     return 1 - sqsum             # Gini impurity = 1 - sum(p_i^2)
 
-def best_split(X:np.ndarray, y:np.ndarray) -> tuple[int | None, float]:
-    """(best_feature, best_gain); best_feature is None if no split reduces impurity"""
+def best_split(X:np.ndarray, 
+               y:np.ndarray, 
+               max_features: int | None = None, 
+               rng: np.random.Generator | None = None
+            ) -> tuple[int | None, float]:
+    """(best_feature, best_gain); best_feature is None if no split reduces impurity
+    
+    max_features -> creates a random subset of features to consider
+    (generates randomness to decrease variance)
+    """
 
     best_feature = None 
     best_gain = float(0.0)
 
     parent_gini=gini(y)
 
-    for j in range(X.shape[1]):
+    features=range(X.shape[1])
+
+    if max_features is not None:
+        features = rng.choice(features, size=max_features, replace=False)
+
+    for j in features:
         left  = y[X[:, j] == 0]
         right = y[X[:, j] == 1]
 
