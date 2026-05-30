@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from core.RF.tree import DecisionTree
+from core.RF.tree import DecisionTree, CLASSIFICATION
 
 class RandomForest:
     """Bagging ensemble of CART-style classification trees.
@@ -39,11 +39,12 @@ class RandomForest:
     random_state: seed for the forest's rng (bootstrap row sampling and each
                   tree's seed), for reproducible runs.
     """
-    def __init__(self, n_estimators: int = 100, max_features: int | None = None, random_state: int | None = None):
+    def __init__(self, n_estimators=100, max_features=None, random_state=None, task=None):
         self.n_estimators = n_estimators
-        self.max_features = max_features        # None → use sqrt(n_features) at fit
+        self.max_features = max_features
         self.rng = np.random.default_rng(random_state)
-        self.trees: list[DecisionTree] = []
+        self.task = task if task is not None else CLASSIFICATION
+        self.trees = []
 
     def fit(self, X, y) -> RandomForest:
         self.trees = []                       # fresh, so re-fitting doesn't accumulate
@@ -62,23 +63,11 @@ class RandomForest:
 
             seed = int(self.rng.integers(2**32))
 
-            tree = DecisionTree(max_features=mf, random_state=seed).fit(X_boot, y_boot)
+            tree = DecisionTree(max_features=mf, random_state=seed, task=self.task).fit(X_boot, y_boot)
             self.trees.append(tree)
 
         return self
 
     def predict(self, X) -> np.ndarray:
-        
-        preds = []
-        final_preds = []
-
-        for tree in self.trees:
-            preds.append(tree.predict(X))
-
-        preds = np.array(preds)
-
-        for i in range(preds.shape[1]):
-            prediction = np.bincount(preds[:,i]).argmax()
-            final_preds.append(prediction)
-
-        return np.array(final_preds)
+        preds = np.array([tree.predict(X) for tree in self.trees])   # (n_trees, n_samples)
+        return self.task.aggregate(preds)
