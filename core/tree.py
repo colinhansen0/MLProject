@@ -11,7 +11,8 @@ Pieces:
     - gini(y) / variance(y): node impurity for classification / regression
     - best_split:  scan features, pick the largest impurity drop; with
                    max_features, consider only a random subset of features
-    - fit / grow:  recurse until a stopping rule (pure node, or no useful split)
+    - fit / grow:  recurse until a stopping rule (max depth, pure node, or no
+                   useful split)
     - predict:     route each row down to a leaf and return its value
 
 Design notes:
@@ -44,28 +45,43 @@ class Node:
         return self.prediction is not None
 
 class DecisionTree:
-    """CART-style binary classification tree.
+    """CART-style binary decision tree, objective-agnostic via a pluggable task.
+
+    The same tree structure serves classification or regression; only the task
+    (impurity + leaf value) swaps.
 
     max_features: if set, each split considers a random subset of this many
                   features (the randomness a forest relies on); None scans all
                   features for a plain, deterministic tree.
+    max_depth:    if set, a node that reaches this depth becomes a leaf instead
+                  of splitting further, capping how deep the tree grows; None
+                  lets it grow until another stopping rule fires.
     random_state: seed for the per-split feature sampling, for reproducible runs.
+    task:         the objective-specific impurity + leaf value (defaults to
+                  CLASSIFICATION).
     """
         
-    def __init__(self, max_features=None, random_state=None, task=None):
+    def __init__(self, max_features=None, random_state=None, task=None, max_depth=None):
         self.root = None
         self.max_features = max_features
+        self.max_depth = max_depth
         self.rng = np.random.default_rng(random_state)
         self.task = task if task is not None else CLASSIFICATION
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> "DecisionTree":
-        self.root = self._grow(X, y)
+        depth = 0
+        self.root = self._grow(X, y, depth)
         return self
 
-    def _grow(self, X: np.ndarray, y: np.ndarray) -> Node:
-        """3 cases, pure split, no best split, and a case where there is a good split (recursive),
-        Utilized in fit to create a single algorithmically generated gini minimizing tree
+    def _grow(self, X: np.ndarray, y: np.ndarray, depth: int) -> Node:
+        """4 cases, max depth reached, pure split, no best split, and a case where there is a good split (recursive),
+        Utilized in fit to create a single algorithmically generated gini/variance minimizing tree
         """
+
+        #Reach max_depth case
+        if self.max_depth is not None and depth >= self.max_depth:
+            return Node(prediction=self.task.leaf_value(y))
+
         #Pure split case (100% one group)
         if len(np.unique(y)) == 1:
             return Node(prediction=self.task.leaf_value(y))
@@ -81,8 +97,8 @@ class DecisionTree:
         mask = X[:, feature] == 0
         X_left,  y_left  = X[mask],  y[mask]
         X_right, y_right = X[~mask], y[~mask]
-        left_child  = self._grow(X_left,  y_left)
-        right_child = self._grow(X_right, y_right)
+        left_child  = self._grow(X_left,  y_left, depth + 1)
+        right_child = self._grow(X_right, y_right, depth + 1)
         return Node(feature=feature, left=left_child, right=right_child)
 
     def predict(self, X: np.ndarray) -> np.ndarray:

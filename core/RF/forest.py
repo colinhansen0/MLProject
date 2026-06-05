@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from core.RF.tree import DecisionTree, CLASSIFICATION
+from core.tree import DecisionTree, CLASSIFICATION
 
 class RandomForest:
     """Bagging ensemble of CART-style classification trees.

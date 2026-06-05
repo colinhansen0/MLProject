@@ -10,7 +10,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
 
 from core.data import get_dataset
-from core.RF.tree import DecisionTree
+from core.tree import DecisionTree
 
 def main() -> None:
     X, y_class, _ = get_dataset()          # binary target; ignore pIC50 for now

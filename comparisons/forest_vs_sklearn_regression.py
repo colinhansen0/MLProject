@@ -7,7 +7,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import r2_score, mean_squared_error
 
 from core.data import get_dataset
-from core.RF.tree import DecisionTree, REGRESSION
+from core.tree import DecisionTree, REGRESSION
 from core.RF.forest import RandomForest
 
 
