@@ -4,8 +4,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 
-from core.data import get_dataset
-from core.RF.forest import RandomForest
+from core.ML.data import get_dataset
+from core.ML.RF.forest import RandomForest
 
 
 def main() -> None:

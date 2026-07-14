@@ -38,7 +38,7 @@ import numpy as np
 from dataclasses import dataclass
 from collections.abc import Callable
 
-from core.tree import DecisionTree, REGRESSION
+from core.ML.tree import DecisionTree, REGRESSION
 
 class Boost:
     def __init__(self, n_estimators=50, learning_rate=0.1, max_depth=None, random_state=None, loss=None):

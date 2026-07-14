@@ -14,9 +14,9 @@ import numpy as np
 
 # adjust to wherever tree.py lives — tries both in case you moved it up
 try:
-    from core.tree import DecisionTree, CLASSIFICATION, REGRESSION
+    from core.ML.tree import DecisionTree, CLASSIFICATION, REGRESSION
 except ImportError:
-    from core.tree import DecisionTree, CLASSIFICATION, REGRESSION
+    from core.ML.tree import DecisionTree, CLASSIFICATION, REGRESSION
 
 
 def realized_depth(node) -> int:
