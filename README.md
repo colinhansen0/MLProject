@@ -1,6 +1,6 @@
 # MLProject
 
-Classic ML algorithms built from scratch in numpy, validated against their production equivalents (scikit-learn now; XGBoost and PyTorch to come). A personal learning project for understanding the internals, run on a molecular drug-discovery dataset.
+Classic ML algorithms built from scratch in numpy, validated against their production equivalents (scikit-learn now; PyTorch to come). A personal learning project for understanding the internals, run on a molecular drug-discovery dataset.
 
 > Draft README — work in progress.
 
