@@ -6,9 +6,9 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import r2_score, mean_squared_error
 
-from core.ML.data import get_dataset
-from core.ML.tree import DecisionTree, REGRESSION
-from core.ML.Boost.boost import Boost, SQUARED_ERROR
+from core.data import get_dataset
+from core.tree import DecisionTree, REGRESSION
+from core.Boost.boost import Boost, SQUARED_ERROR
 
 
 def rmse(y_true, y_pred):

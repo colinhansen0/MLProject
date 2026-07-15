@@ -4,8 +4,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import accuracy_score
 
-from core.ML.data import get_dataset
-from core.ML.Boost.boost import Boost, LOG_LOSS
+from core.data import get_dataset
+from core.Boost.boost import Boost, LOG_LOSS
 
 
 def main() -> None:

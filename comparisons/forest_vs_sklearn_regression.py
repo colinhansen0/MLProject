@@ -6,9 +6,9 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import r2_score, mean_squared_error
 
-from core.ML.data import get_dataset
-from core.ML.tree import DecisionTree, REGRESSION
-from core.ML.RF.forest import RandomForest
+from core.data import get_dataset
+from core.tree import DecisionTree, REGRESSION
+from core.RF.forest import RandomForest
 
 
 def rmse(y_true, y_pred):
