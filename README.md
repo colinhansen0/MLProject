@@ -15,17 +15,20 @@ The data comes from the BACE set (MoleculeNet): ~1,500 molecules carrying both a
 - [x] Phase 1 — decision tree and random forest (classification + regression), vs scikit-learn
 - [x] Phase 2 — gradient boosting (classification + regression), vs scikit-learn
 - [ ] Phase 3 — multilayer perceptron with manual backprop, vs PyTorch
+- [x] Add-on: Morgan fingerprint from scratch (the featurization step itself), vs RDKit
 
 ## Layout
 
 ```
 core/
   data.py            # load BACE, featurize to Morgan fingerprints, cache to disk
-  tree.py            # DecisionTree — shared base learner, objective-agnostic via a pluggable task
+  tree.py            # DecisionTree, shared base learner, objective-agnostic via a pluggable task
   RF/
-    forest.py        # RandomForest — bagging + per-split feature subsampling + vote/average
+    forest.py        # RandomForest: bagging + per-split feature subsampling + vote/average
   Boost/
-    boost.py         # Boost — gradient boosting, pluggable loss (squared error / log loss)
+    boost.py         # Boost: gradient boosting, pluggable loss (squared error / log loss)
+  FP/
+    fingerprint.py   # Morgan/ECFP fingerprint from scratch, vs RDKit (add-on, not a phase)
 comparisons/
   tree_vs_sklearn.py
   forest_vs_sklearn.py
@@ -89,3 +92,9 @@ Held-out test set; 100 trees, depth 3, learning rate 0.1, matched on both sides.
 | boosting (regression) | R² | ~0.62 | ~0.62 |
 
 Regression matches scikit-learn almost exactly. Classification trails slightly because scikit-learn refines each leaf with a Newton step (the optimal log-loss value) while the from-scratch version uses plain mean leaves; the two still agree on ~93% of predictions. A second-order comparison against XGBoost is a possible extension.
+
+## Add-on: Morgan fingerprint from scratch
+
+A short side project outside the three phases. Reimplements the Morgan featurization every phase relies on, taking RDKit's parsed mol as input: hash each atom's local properties into a starting id, run Weisfeiler-Lehman rounds that fold in neighbor ids, then collect every id into a 2048-bit vector.
+
+Validated against RDKit by comparing the (atom, radius) substructures each one enumerates, not bit positions (those depend on RDKit's internal hash). Benzene matches exactly; ethanol comes out a strict superset because this version skips ECFP's duplicate-environment rule, adding a few redundant bits without capturing any wrong substructure.
