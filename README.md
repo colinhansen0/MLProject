@@ -1,8 +1,6 @@
 # MLProject
 
-Classic ML algorithms built from scratch in numpy, validated against their production equivalents (scikit-learn now; PyTorch to come). A personal learning project for understanding the internals, run on a molecular drug-discovery dataset.
-
-> Draft README — work in progress.
+Classic ML algorithms built from scratch in numpy, validated against their production equivalents (currently scikit-learn). A personal learning project for understanding the internals, run on a molecular drug-discovery dataset.
 
 ## Idea
 
@@ -14,8 +12,12 @@ The data comes from the BACE set (MoleculeNet): ~1,500 molecules carrying both a
 
 - [x] Phase 1 — decision tree and random forest (classification + regression), vs scikit-learn
 - [x] Phase 2 — gradient boosting (classification + regression), vs scikit-learn
-- [ ] Phase 3 — multilayer perceptron with manual backprop, vs PyTorch
 - [x] Add-on: Morgan fingerprint from scratch (the featurization step itself), vs RDKit
+
+### Planned / possible future work
+
+- Phase 3 — multilayer perceptron with manual backprop, validated against a deep-learning framework.
+- A second-order boosting comparison against XGBoost.
 
 ## Layout
 
@@ -46,6 +48,7 @@ data/                 # gitignored (raw csv + cached features)
 ```bash
 python -m venv .venv
 .venv\Scripts\Activate.ps1        # Windows PowerShell
+# source .venv/bin/activate       # macOS / Linux
 pip install numpy pandas scikit-learn rdkit jupyterlab matplotlib
 ```
 
@@ -91,7 +94,7 @@ Held-out test set; 100 trees, depth 3, learning rate 0.1, matched on both sides.
 | boosting (classification) | accuracy | ~0.82 | ~0.85 |
 | boosting (regression) | R² | ~0.62 | ~0.62 |
 
-Regression matches scikit-learn almost exactly. Classification trails slightly because scikit-learn refines each leaf with a Newton step (the optimal log-loss value) while the from-scratch version uses plain mean leaves; the two still agree on ~93% of predictions. A second-order comparison against XGBoost is a possible extension.
+Regression matches scikit-learn almost exactly. Classification trails slightly because scikit-learn refines each leaf with a Newton step (the optimal log-loss value) while the from-scratch version uses plain mean leaves; the two still agree on ~93% of predictions.
 
 ## Add-on: Morgan fingerprint from scratch
 
