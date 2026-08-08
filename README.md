@@ -4,7 +4,7 @@ Classic ML algorithms built from scratch in numpy, validated against their produ
 
 ## Idea
 
-Each algorithm is implemented with numpy and plain math, then validated against a production library on the *same* features. The established libraries are used only as a yardstick, never inside the algorithms themselves. The data pipeline uses RDKit for molecular featurization.
+Each algorithm is implemented with numpy and plain math, then validated against a production library on the same features. The established libraries are used only as a yardstick, never inside the algorithms themselves. The data pipeline uses RDKit for molecular featurization.
 
 The data comes from the BACE set (MoleculeNet): ~1,500 molecules carrying both a binary activity label and a continuous potency value (pIC50), so the same models can be tested on classification and regression.
 
