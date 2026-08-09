@@ -14,10 +14,9 @@ The data comes from the BACE set (MoleculeNet): ~1,500 molecules carrying both a
 - [x] Phase 2 — gradient boosting (classification + regression), vs scikit-learn
 - [x] Add-on: Morgan fingerprint from scratch (the featurization step itself), vs RDKit
 
-### Planned / possible future work
+## IN PROGRESS
 
 - Phase 3 — multilayer perceptron with manual backprop, validated against a deep-learning framework.
-- A second-order boosting comparison against XGBoost.
 
 ## Layout
 
