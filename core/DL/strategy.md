@@ -11,5 +11,5 @@ The I will compare with PyTorch and practice that library
 
 
 CHANGES:
-    I will now be making the MLP on the mnist dataset as I find it more intersting for learning
+    I will now be making the MLP on the mnist dataset as I find it more interesting for learning
     I also have more applicable material
